@@ -255,35 +255,54 @@ public class LibraryDao {
 	
 	}
 	
-
-	
 	public int returnBook(Connection conn, int selectKey, int selectCode) {
-		int result1 = 0;
-		int result2 = 0;
-		int result3 = 0;
+		int result = 0;
+
 		PreparedStatement pstmt = null;
-		PreparedStatement pstmt2 = null;
-		String sql = "UPDATE tb_human set hm_rentbookcode = 0 where hm_key = ?";
-		String sql2 = "UPDATE tb_book set BK_ISRENT = 1 where bk_code = ?";
+		String sql = "insert tb_rentlog values(seq_rentlog,?,?,'반납',default)";
 		try {
 			pstmt = conn.prepareStatement(sql);
 			pstmt.setInt(1, selectKey);
-			result1 = pstmt.executeUpdate();
-			
-			pstmt2 = conn.prepareStatement(sql2);
-			pstmt2.setInt(1, selectCode);
-			result2 = pstmt2.executeUpdate();
-			result3 = result1 + result2;
+			result = pstmt.executeUpdate();
 		} catch (SQLException e) {
 			e.printStackTrace();
 		} finally {
 			LibraryTemplate.close(pstmt);
-			LibraryTemplate.close(pstmt2);
 		}
 		
-		return result3;
+		return result;
 	
 	}
+	
+
+	
+//	public int returnBook(Connection conn, int selectKey, int selectCode) {
+//		int result1 = 0;
+//		int result2 = 0;
+//		int result3 = 0;
+//		PreparedStatement pstmt = null;
+//		PreparedStatement pstmt2 = null;
+//		String sql = "UPDATE tb_human set hm_rentbookcode = 0 where hm_key = ?";
+//		String sql2 = "UPDATE tb_book set BK_ISRENT = 1 where bk_code = ?";
+//		try {
+//			pstmt = conn.prepareStatement(sql);
+//			pstmt.setInt(1, selectKey);
+//			result1 = pstmt.executeUpdate();
+//			
+//			pstmt2 = conn.prepareStatement(sql2);
+//			pstmt2.setInt(1, selectCode);
+//			result2 = pstmt2.executeUpdate();
+//			result3 = result1 + result2;
+//		} catch (SQLException e) {
+//			e.printStackTrace();
+//		} finally {
+//			LibraryTemplate.close(pstmt);
+//			LibraryTemplate.close(pstmt2);
+//		}
+//		
+//		return result3;
+//	
+//	}
 	
 	public ArrayList<Human> allHuman(Connection conn){
 		ArrayList<Human> HmList = new ArrayList<>();
@@ -320,6 +339,38 @@ public class LibraryDao {
 	
 
 	public ArrayList<Book> allBook(Connection conn){
+		ArrayList<Book> bkList = new ArrayList<>();
+		Book bk;
+		PreparedStatement pstmt = null;
+		ResultSet rset = null;
+		String sql = "select * from tb_book";
+		
+		try {
+			pstmt = conn.prepareStatement(sql);
+			rset = pstmt.executeQuery();
+			
+			while(rset.next()) {
+				bk = new Book();
+				bk.setTitle(rset.getString("bk_title"));
+				bk.setAuthor(rset.getString("bk_author"));
+				bk.setCode(rset.getInt("bk_code"));
+				bk.setStock(rset.getInt("bk_stock"));
+				bk.setIsRent(rset.getInt("bk_isrent"));
+			
+				
+				bkList.add(bk);
+
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} finally {
+			LibraryTemplate.close(pstmt);
+		}
+		
+		return bkList;
+	}
+	
+	public ArrayList<Book> allIsRentLog(Connection conn){
 		ArrayList<Book> bkList = new ArrayList<>();
 		Book bk;
 		PreparedStatement pstmt = null;

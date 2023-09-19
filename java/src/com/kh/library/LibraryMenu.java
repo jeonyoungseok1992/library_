@@ -170,21 +170,10 @@ public class LibraryMenu {
 	
 
 	public void returnBook() {
-		boolean isRentLog = false;
-		for(RentLog rl : lc.allisRentLog()) {
-			if(rl.getrentInOut.equals("대여")) {
-				isHuman = true;
-				break;
-			}
-		}
-		if(!isRentLog) {
-			System.out.println("책을 대여 중인 회원이 없습니다");
-			return;
-		} 
 		
 		boolean isBook = false;
 		for(Book bk : lc.allBook()) {
-			if(bk.getIsRent() != 1) {
+			if(bk.getIsRent() == 1) {
 				isBook = true;
 				break;
 			}

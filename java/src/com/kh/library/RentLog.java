@@ -6,6 +6,8 @@ public class RentLog {
 	private int bk_rentCode;
 	private String rentInOut;
 	private String enrollDate;
+	
+	
 	public int getLogNo() {
 		return logNo;
 	}
