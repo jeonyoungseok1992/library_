@@ -8,6 +8,7 @@ public class RentLog {
 	private String enrollDate;
 	
 	
+	
 	public int getLogNo() {
 		return logNo;
 	}
@@ -35,7 +36,14 @@ public class RentLog {
 	public String getEnrollDate() {
 		return enrollDate;
 	}
+
 	public void setEnrollDate(String enrollDate) {
 		this.enrollDate = enrollDate;
+	}
+	
+	@Override
+	public String toString() {
+		return logNo + "\t" + hm_rentKey + "\t" + bk_rentCode
+				+ "\t" +rentInOut + "\t" +enrollDate ;
 	}
 }

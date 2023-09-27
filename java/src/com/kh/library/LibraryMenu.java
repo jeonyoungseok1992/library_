@@ -3,14 +3,19 @@ package com.kh.library;
 import java.util.*;
 
 public class LibraryMenu {
+	
+	
 	LibraryController lc = new LibraryController();
+	
+	LibraryService ls = new LibraryService();
 
 	Scanner sc = new Scanner(System.in);
 
 
 	public void mainMenu() {
-		int number = 0;
-		while (number != 9) {
+		int number = 99;
+		while (number != 0) {
+		
 			System.out.println("============================");
 			System.out.println("1. 도서등록");
 			System.out.println("2. 도서대여");
@@ -20,16 +25,23 @@ public class LibraryMenu {
 			System.out.println("6. 회원삭제");
 			System.out.println("7. 도서조회");
 			System.out.println("8. 회원조회");
+			System.out.println("9. 대여기록조회");
+			System.out.println("10. 로그인");
 			System.out.println("0. 프로그램 종료");
 			System.out.println("============================");
 			System.out.println("원하시는 서비스 번호를 입력하세요 : ");
 
-			// 원하는 서비스 번호 입력받기
+		
 			number = sc.nextInt();
 			sc.nextLine();
 			switch (number) {
-				case 1:
+				case 1:					
+					if(!adminCheck()) {
+						System.out.println("관리자 권한이 필요합니다");
+						break;
+					}		
 					createBook();
+					
 					break;
 				case 2:
 					rentBook();
@@ -51,6 +63,12 @@ public class LibraryMenu {
 					break;
 				case 8:
 					lc.printHumanList();				
+					break;
+				case 9:
+					lc.printRentLog();				
+					break;
+				case 10:
+					login();				
 					break;
 				case 0:
 					System.out.println("프로그램을 종료합니다.");
@@ -170,10 +188,21 @@ public class LibraryMenu {
 	
 
 	public void returnBook() {
+		boolean isRentLog = false;
+		for(RentLog rl : lc.allRentLog()) {
+			if(rl.getRentInOut().equals("대여")) {
+				isRentLog = true;
+				break;
+			}
+		}
+		if(!isRentLog) {
+			System.out.println("책을 대여 중인 회원이 없습니다");
+			return;
+		} 
 		
 		boolean isBook = false;
 		for(Book bk : lc.allBook()) {
-			if(bk.getIsRent() == 1) {
+			if(bk.getIsRent() != 0) {
 				isBook = true;
 				break;
 			}
@@ -213,11 +242,15 @@ public class LibraryMenu {
 	}
 
 	public void createHuman() {
-		String name, residentNumber;
+		String name, residentNumber, admin, id, pwd;
 		int age;
 		char gender;
 		while(true) {
 		try {
+		System.out.println("아이디를 입력하세요 : ");
+		id = sc.nextLine();
+		System.out.println("비밀번호를 입력하세요 : ");
+		pwd = sc.nextLine();
 		System.out.print("이름을 입력하세요 : ");
 		name = sc.nextLine();
 		System.out.print("주민등록번호 앞 6자리를 입력하세요. : ");
@@ -231,8 +264,10 @@ public class LibraryMenu {
 			System.out.println("남 : M, 여자는: F에 맞게 입력해주세요");
 			return;
 		}
+		System.out.println("권한 등급을 입력해주세요");
+		admin = sc.nextLine();
 		
-		lc.createHuman(name, residentNumber, age, gender);
+		lc.createHuman(id, pwd, name, residentNumber, age, gender, admin);
 		break;
 		} 
 		catch(Exception e){
@@ -266,6 +301,36 @@ public class LibraryMenu {
 		lc.createBook(title, author, stock);
 		break;
 		}
+	}
+	
+	public void login() {
+		System.out.println("아이디를 입력하세요 : ");
+		String id = sc.nextLine();
+		System.out.println("비밀번호를 입력하세요 : ");
+		String pwd = sc.nextLine();
+		lc.login(id, pwd);
+	}
+	
+	public boolean adminCheck() {
+		boolean isAdmin = false;
+		
+//		if(ls.hum.getAdmin() == null) {
+//			System.out.println("로그인 하세요");
+//		}
+//		login();
+//		}
+//		if(ls.hum.getAdmin() != null)
+//			return isAdmin;
+//
+		if(ls.hum != null && ls.hum.getAdmin() != null && ls.hum.getAdmin().equals("관리자")){
+			isAdmin = true;
+		}
+		
+//		if(lc.hum.getAdmin() != null && lc.hum.getAdmin().equals("관리자")){
+//			isAdmin = true;
+//		}
+		
+		return isAdmin;
 	}
 	
 //	public ArrayList<Human> allHuman() {
@@ -304,9 +369,19 @@ public class LibraryMenu {
 	public void displayHumanList(ArrayList<Human> HmList) {
 		System.out.println("--------------------------------");
 		
-		System.out.println("번호 \t 이름 \t 주민번호\t나이\t성별\t 대여여부");
+		System.out.println("번호 \t 이름 \t 주민번호\t나이\t성별\t권한");
 		for(Human hm : HmList) {
 			System.out.println(hm);	
+		}
+		System.out.println("--------------------------------");
+	}
+	
+	public void displayRentLog(ArrayList<RentLog> rlList) {
+		System.out.println("--------------------------------");
+		
+		System.out.println("번호 \t 사람key \t 책code\t대여여부\t대여날짜");
+		for(RentLog rl : rlList) {
+			System.out.println(rl);	
 		}
 		System.out.println("--------------------------------");
 	}
